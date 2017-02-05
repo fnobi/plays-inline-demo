@@ -48,13 +48,14 @@ table {
 }
 .full-video {
   display: block;
-  max-width: 100%; }
+  width: 100%; }
 
 .ui {
   position: fixed;
   top: 0px;
-  right: 0px;
-  text-align: right; }
+  left: 0px;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5); }
 
 .ui__item {
   margin: 1em; }
@@ -63,3 +64,6 @@ table {
   font-family: sans-serif;
   font-size: 16px;
   line-height: 1.5; }
+
+body {
+  overflow: hidden; }
