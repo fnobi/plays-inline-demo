@@ -18,8 +18,8 @@ import RevLogger from 'rev-logger';
 // const
 const SRC = './src';
 const CONFIG = './src/config';
-const HTDOCS = './public';
-const BASE_PATH = '';
+const HTDOCS = '.';
+const BASE_PATH = '/demo';
 const DEST = `${HTDOCS}${BASE_PATH}`;
 
 const revLogger = new RevLogger({
