@@ -8,4 +8,10 @@ prepend ConfigBlock
 //- append JavascriptBlock
 
 block ContentBlock
-  | hello, world!
+  video.js-video
+    source(src="./video/sample.mp4")
+  ul.ui
+    li.ui__item
+      button.js-play-button play
+    li.ui__item
+      button.js-pause-button pause

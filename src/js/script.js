@@ -1,10 +1,12 @@
-import Sample from './lib/Sample';
-import $ from 'jquery';
+const videoDom = document.querySelector('.js-video');
 
-const sample = new Sample({
-    name: 'world'
+const playButton = document.querySelector('.js-play-button');
+const pauseButton = document.querySelector('.js-pause-button');
+
+playButton.addEventListener('click', () => {
+    videoDom.play();
 });
 
-$('.wrapper').on('click', () => {
-    console.log(`hello, ${sample.name}.`);
+pauseButton.addEventListener('click', () => {
+    videoDom.pause();
 });
