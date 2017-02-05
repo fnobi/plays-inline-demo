@@ -53,7 +53,8 @@ table {
 .ui {
   position: fixed;
   top: 0px;
-  right: 0px; }
+  right: 0px;
+  text-align: right; }
 
 .ui__item {
   margin: 1em; }

@@ -2,16 +2,38 @@
 'use strict';
 
 var videoDom = document.querySelector('.js-video');
-
 var playButton = document.querySelector('.js-play-button');
 var pauseButton = document.querySelector('.js-pause-button');
 
-playButton.addEventListener('click', function () {
-    videoDom.play();
-});
+function init() {
+    if (!isAvailable()) {
+        alert('この端末は、インライン動画再生に対応していません！');
+        return;
+    }
+    initInline();
+    initListeners();
+}
 
-pauseButton.addEventListener('click', function () {
-    videoDom.pause();
-});
+function isAvailable() {
+    var ua = navigator.userAgent;
+    var isIOS = /iphone|ipad|ios/i.test(ua);
+    return !isIOS || 'playsInline' in videoDom;
+}
+
+function initInline() {
+    videoDom.setAttribute('playsInline', 'playsInline');
+}
+
+function initListeners() {
+    playButton.addEventListener('click', function () {
+        videoDom.play();
+    });
+
+    pauseButton.addEventListener('click', function () {
+        videoDom.pause();
+    });
+}
+
+init();
 
 },{}]},{},[1]);
