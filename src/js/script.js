@@ -1,5 +1,5 @@
 import qs from 'querystring';
-import MosaicFilter from './lib/MosaicFilter';
+import GlasFilter from './lib/GlasFilter';
 
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 396;
@@ -38,8 +38,8 @@ function init () {
         };
         
         switch (locationParams.filter) {
-        case 'mosaic':
-            filter = new MosaicFilter(opts);
+        case 'glas':
+            filter = new GlasFilter(opts);
             break;
         }
     } else {
