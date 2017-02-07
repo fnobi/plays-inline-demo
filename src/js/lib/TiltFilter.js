@@ -20,7 +20,7 @@ export default class GlasFilter extends Filter {
     render () {
         const ctx = this.ctx;
         ctx.translate(this.width / 2, this.height / 2);
-        ctx.rotate(-Math.PI * 2 * this.deg / 360);
+        ctx.rotate(-Math.PI * 2 * (this.deg / 2) / 360);
         ctx.drawImage(this.image, -this.width / 2, -this.height / 2);
     }
 };
