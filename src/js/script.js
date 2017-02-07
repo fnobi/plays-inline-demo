@@ -1,5 +1,6 @@
 import qs from 'querystring';
 import GlasFilter from './lib/GlasFilter';
+import TiltFilter from './lib/TiltFilter';
 
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 396;
@@ -40,6 +41,9 @@ function init () {
         switch (locationParams.filter) {
         case 'glas':
             filter = new GlasFilter(opts);
+            break;
+        case 'tilt':
+            filter = new TiltFilter(opts);
             break;
         }
     } else {

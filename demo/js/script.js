@@ -669,6 +669,69 @@ exports.default = GlasFilter;
 },{"./Filter":5}],7:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Filter2 = require('./Filter');
+
+var _Filter3 = _interopRequireDefault(_Filter2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SCALE = 0.05;
+var FINGER_SIZE = 50;
+
+var GlasFilter = function (_Filter) {
+    _inherits(GlasFilter, _Filter);
+
+    function GlasFilter(opts) {
+        _classCallCheck(this, GlasFilter);
+
+        var _this = _possibleConstructorReturn(this, (GlasFilter.__proto__ || Object.getPrototypeOf(GlasFilter)).call(this, opts));
+
+        _this.initListeners();
+        _this.deg = 0;
+        return _this;
+    }
+
+    _createClass(GlasFilter, [{
+        key: 'initListeners',
+        value: function initListeners() {
+            var _this2 = this;
+
+            window.addEventListener('deviceorientation', function (e) {
+                var alpha = e.alpha;
+                _this2.deg = alpha;
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var ctx = this.ctx;
+            ctx.translate(this.width / 2, this.height / 2);
+            ctx.rotate(-Math.PI * 2 * this.deg / 360);
+            ctx.drawImage(this.image, -this.width / 2, -this.height / 2);
+        }
+    }]);
+
+    return GlasFilter;
+}(_Filter3.default);
+
+exports.default = GlasFilter;
+;
+
+},{"./Filter":5}],8:[function(require,module,exports){
+'use strict';
+
 var _querystring = require('querystring');
 
 var _querystring2 = _interopRequireDefault(_querystring);
@@ -676,6 +739,10 @@ var _querystring2 = _interopRequireDefault(_querystring);
 var _GlasFilter = require('./lib/GlasFilter');
 
 var _GlasFilter2 = _interopRequireDefault(_GlasFilter);
+
+var _TiltFilter = require('./lib/TiltFilter');
+
+var _TiltFilter2 = _interopRequireDefault(_TiltFilter);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -717,6 +784,9 @@ function init() {
         switch (locationParams.filter) {
             case 'glas':
                 filter = new _GlasFilter2.default(opts);
+                break;
+            case 'tilt':
+                filter = new _TiltFilter2.default(opts);
                 break;
         }
     } else {
@@ -766,4 +836,4 @@ function drawVideo() {
 
 init();
 
-},{"./lib/GlasFilter":6,"querystring":4}]},{},[7]);
+},{"./lib/GlasFilter":6,"./lib/TiltFilter":7,"querystring":4}]},{},[8]);
