@@ -64,10 +64,23 @@ export default class Filter extends EventEmitter {
     }
 
     addPoint (x, y) {
-        this.points.push([
+        const point = [
             this.width * x / this.canvas.offsetWidth,
             this.height * y / this.canvas.offsetHeight
-        ]);
+        ];
+
+        const length = this.points.length;
+
+        const delta = length ? [
+            point[0] - this.points[length - 1][0],
+            point[1] - this.points[length - 1][1]
+        ] : null;
+        
+        this.points.push(point);
+
+        this.emit('addPoint', {
+            delta: delta
+        });
     }
 
     stopPen () {

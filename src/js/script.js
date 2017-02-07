@@ -1,6 +1,7 @@
 import qs from 'querystring';
 import GlasFilter from './lib/GlasFilter';
 import TiltFilter from './lib/TiltFilter';
+import ScrollFilter from './lib/ScrollFilter';
 
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 396;
@@ -44,6 +45,9 @@ function init () {
             break;
         case 'tilt':
             filter = new TiltFilter(opts);
+            break;
+        case 'scroll':
+            filter = new ScrollFilter(opts);
             break;
         }
     } else {

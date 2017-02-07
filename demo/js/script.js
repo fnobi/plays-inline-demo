@@ -573,7 +573,17 @@ var Filter = function (_EventEmitter) {
     }, {
         key: 'addPoint',
         value: function addPoint(x, y) {
-            this.points.push([this.width * x / this.canvas.offsetWidth, this.height * y / this.canvas.offsetHeight]);
+            var point = [this.width * x / this.canvas.offsetWidth, this.height * y / this.canvas.offsetHeight];
+
+            var length = this.points.length;
+
+            var delta = length ? [point[0] - this.points[length - 1][0], point[1] - this.points[length - 1][1]] : null;
+
+            this.points.push(point);
+
+            this.emit('addPoint', {
+                delta: delta
+            });
         }
     }, {
         key: 'stopPen',
@@ -687,23 +697,89 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SCALE = 0.05;
-var FINGER_SIZE = 50;
+var ScrollFilter = function (_Filter) {
+    _inherits(ScrollFilter, _Filter);
 
-var GlasFilter = function (_Filter) {
-    _inherits(GlasFilter, _Filter);
+    function ScrollFilter(opts) {
+        _classCallCheck(this, ScrollFilter);
 
-    function GlasFilter(opts) {
-        _classCallCheck(this, GlasFilter);
+        var _this = _possibleConstructorReturn(this, (ScrollFilter.__proto__ || Object.getPrototypeOf(ScrollFilter)).call(this, opts));
 
-        var _this = _possibleConstructorReturn(this, (GlasFilter.__proto__ || Object.getPrototypeOf(GlasFilter)).call(this, opts));
+        _this.offsetX = 0;
+        _this.offsetY = 0;
+        _this.initListeners();
+        return _this;
+    }
+
+    _createClass(ScrollFilter, [{
+        key: 'initListeners',
+        value: function initListeners() {
+            var _this2 = this;
+
+            this.on('addPoint', function (e) {
+                var delta = e.delta;
+                if (!delta) {
+                    return;
+                }
+                _this2.offsetX = (_this2.offsetX + delta[0]) % _this2.width;
+                _this2.offsetY = (_this2.offsetY + delta[1]) % _this2.height;
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var ctx = this.ctx;
+            var x2 = this.offsetX < 0 ? this.width : -this.width;
+            var y2 = this.offsetY < 0 ? this.height : -this.height;
+            ctx.translate(this.offsetX, this.offsetY);
+            ctx.drawImage(this.image, 0, 0);
+            ctx.drawImage(this.image, x2, 0);
+            ctx.drawImage(this.image, x2, y2);
+            ctx.drawImage(this.image, 0, y2);
+        }
+    }]);
+
+    return ScrollFilter;
+}(_Filter3.default);
+
+exports.default = ScrollFilter;
+;
+
+},{"./Filter":5}],8:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Filter2 = require('./Filter');
+
+var _Filter3 = _interopRequireDefault(_Filter2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var TiltFilter = function (_Filter) {
+    _inherits(TiltFilter, _Filter);
+
+    function TiltFilter(opts) {
+        _classCallCheck(this, TiltFilter);
+
+        var _this = _possibleConstructorReturn(this, (TiltFilter.__proto__ || Object.getPrototypeOf(TiltFilter)).call(this, opts));
 
         _this.initListeners();
         _this.deg = 0;
         return _this;
     }
 
-    _createClass(GlasFilter, [{
+    _createClass(TiltFilter, [{
         key: 'initListeners',
         value: function initListeners() {
             var _this2 = this;
@@ -723,13 +799,13 @@ var GlasFilter = function (_Filter) {
         }
     }]);
 
-    return GlasFilter;
+    return TiltFilter;
 }(_Filter3.default);
 
-exports.default = GlasFilter;
+exports.default = TiltFilter;
 ;
 
-},{"./Filter":5}],8:[function(require,module,exports){
+},{"./Filter":5}],9:[function(require,module,exports){
 'use strict';
 
 var _querystring = require('querystring');
@@ -743,6 +819,10 @@ var _GlasFilter2 = _interopRequireDefault(_GlasFilter);
 var _TiltFilter = require('./lib/TiltFilter');
 
 var _TiltFilter2 = _interopRequireDefault(_TiltFilter);
+
+var _ScrollFilter = require('./lib/ScrollFilter');
+
+var _ScrollFilter2 = _interopRequireDefault(_ScrollFilter);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -787,6 +867,9 @@ function init() {
                 break;
             case 'tilt':
                 filter = new _TiltFilter2.default(opts);
+                break;
+            case 'scroll':
+                filter = new _ScrollFilter2.default(opts);
                 break;
         }
     } else {
@@ -836,4 +919,4 @@ function drawVideo() {
 
 init();
 
-},{"./lib/GlasFilter":6,"./lib/TiltFilter":7,"querystring":4}]},{},[8]);
+},{"./lib/GlasFilter":6,"./lib/ScrollFilter":7,"./lib/TiltFilter":8,"querystring":4}]},{},[9]);

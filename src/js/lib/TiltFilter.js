@@ -1,9 +1,6 @@
 import Filter from './Filter';
 
-const SCALE = 0.05;
-const FINGER_SIZE = 50;
-
-export default class GlasFilter extends Filter {
+export default class TiltFilter extends Filter {
     constructor (opts) {
         super(opts);
         this.initListeners();
