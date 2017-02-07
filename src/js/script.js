@@ -13,12 +13,14 @@ const locationParams = qs.parse(locationSearch);
 
 
 function init () {
+    initPlayer();
+    
     if (!isAvailable()) {
         alert('この端末は、インライン動画再生に対応していません！');
+        videoDom.style.display = 'none';
         return;
     }
     initInline();
-    initListeners();
 
     if (locationParams['use-canvas']) {
         initCanvas();
@@ -50,7 +52,7 @@ function initCanvas () {
     update();
 }
 
-function initListeners () {
+function initPlayer () {
     playButton.addEventListener('click', () => {
         videoDom.play();
     });
