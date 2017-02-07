@@ -180,22 +180,125 @@ exports.encode = exports.stringify = require('./encode');
 },{"./decode":1,"./encode":2}],4:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Filter = function () {
+    function Filter(opts) {
+        _classCallCheck(this, Filter);
+
+        this.canvas = opts.canvas || document.createElement('canvas');
+        this.width = isNaN(opts.width) ? 0 : opts.width;
+        this.height = isNaN(opts.height) ? 0 : opts.height;
+        this.image = opts.image;
+
+        this.ctx = this.canvas.getContext('2d');
+    }
+
+    _createClass(Filter, [{
+        key: 'drawImage',
+        value: function drawImage() {
+            this.ctx.drawImage(this.image, 0, 0, this.width, this.height);
+        }
+    }]);
+
+    return Filter;
+}();
+
+exports.default = Filter;
+;
+
+},{}],5:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Filter2 = require('./Filter');
+
+var _Filter3 = _interopRequireDefault(_Filter2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SCALE = 0.05;
+
+var MosaicFilter = function (_Filter) {
+    _inherits(MosaicFilter, _Filter);
+
+    function MosaicFilter(opts) {
+        _classCallCheck(this, MosaicFilter);
+
+        var _this = _possibleConstructorReturn(this, (MosaicFilter.__proto__ || Object.getPrototypeOf(MosaicFilter)).call(this, opts));
+
+        _this.initSmallCanvas();
+        return _this;
+    }
+
+    _createClass(MosaicFilter, [{
+        key: 'initSmallCanvas',
+        value: function initSmallCanvas() {
+            var smallCanvas = document.createElement('canvas');
+            smallCanvas.width = Math.floor(this.width * SCALE);
+            smallCanvas.height = Math.floor(this.height * SCALE);
+            this.smallCanvas = smallCanvas;
+            this.smallCtx = smallCanvas.getContext('2d');
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var ctx = this.ctx;
+            this.drawImage();
+            this.smallCtx.drawImage(this.canvas, 0, 0, this.width * SCALE, this.height * SCALE);
+            ctx.drawImage(this.smallCanvas, 0, 0, this.width, this.height);
+        }
+    }]);
+
+    return MosaicFilter;
+}(_Filter3.default);
+
+exports.default = MosaicFilter;
+;
+
+},{"./Filter":4}],6:[function(require,module,exports){
+'use strict';
+
 var _querystring = require('querystring');
 
 var _querystring2 = _interopRequireDefault(_querystring);
+
+var _MosaicFilter = require('./lib/MosaicFilter');
+
+var _MosaicFilter2 = _interopRequireDefault(_MosaicFilter);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var VIDEO_WIDTH = 640;
 var VIDEO_HEIGHT = 396;
 
+var locationSearch = (location.search || '').replace(/^\?/, '');
+var locationParams = _querystring2.default.parse(locationSearch);
+
 var videoDom = document.querySelector('.js-video');
 var canvasDom = document.querySelector('.js-canvas');
 var playButton = document.querySelector('.js-play-button');
 var pauseButton = document.querySelector('.js-pause-button');
+var ctx = canvasDom.getContext('2d');
 
-var locationSearch = (location.search || '').replace(/^\?/, '');
-var locationParams = _querystring2.default.parse(locationSearch);
+var filter = void 0;
 
 function init() {
     initPlayer();
@@ -209,6 +312,20 @@ function init() {
 
     if (locationParams['use-canvas']) {
         initCanvas();
+    } else if (locationParams.filter) {
+        initCanvas();
+        var opts = {
+            canvas: canvasDom,
+            image: videoDom,
+            width: VIDEO_WIDTH,
+            height: VIDEO_HEIGHT
+        };
+
+        switch (locationParams.filter) {
+            case 'mosaic':
+                filter = new _MosaicFilter2.default(opts);
+                break;
+        }
     } else {
         canvasDom.style.display = 'none';
     }
@@ -227,11 +344,14 @@ function initInline() {
 function initCanvas() {
     videoDom.style.display = 'none';
 
-    var ctx = canvasDom.getContext('2d');
     var update = function update() {
         canvasDom.width = VIDEO_WIDTH;
         canvasDom.height = VIDEO_HEIGHT;
-        ctx.drawImage(videoDom, 0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
+        if (filter) {
+            filter.render();
+        } else {
+            drawVideo();
+        }
         requestAnimationFrame(update);
     };
     update();
@@ -247,6 +367,10 @@ function initPlayer() {
     });
 }
 
+function drawVideo() {
+    ctx.drawImage(videoDom, 0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
+}
+
 init();
 
-},{"querystring":3}]},{},[4]);
+},{"./lib/MosaicFilter":5,"querystring":3}]},{},[6]);
