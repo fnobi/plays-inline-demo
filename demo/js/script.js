@@ -709,8 +709,8 @@ var GlasFilter = function (_Filter) {
             var _this2 = this;
 
             window.addEventListener('deviceorientation', function (e) {
-                var alpha = e.alpha;
-                _this2.deg = alpha;
+                var gamma = e.gamma;
+                _this2.deg = gamma;
             });
         }
     }, {

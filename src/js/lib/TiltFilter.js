@@ -12,8 +12,8 @@ export default class GlasFilter extends Filter {
 
     initListeners () {
         window.addEventListener('deviceorientation', (e) => {
-            const alpha = e.alpha;
-            this.deg = alpha;
+            const gamma = e.gamma;
+            this.deg = gamma;
         });
     }
     
