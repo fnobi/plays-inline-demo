@@ -534,6 +534,7 @@ var Filter = function (_EventEmitter) {
                 var touch = touches[0];
                 if (!touch) return;
 
+                e.preventDefault();
                 _this2.handlePointerStart(touch);
             });
 
@@ -544,6 +545,7 @@ var Filter = function (_EventEmitter) {
                 var touch = touches[0];
                 if (!touch) return;
 
+                e.preventDefault();
                 _this2.handlePointerMove(touch);
             });
 
@@ -613,6 +615,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SCALE = 0.05;
+var FINGER_SIZE = 50;
 
 var GlasFilter = function (_Filter) {
     _inherits(GlasFilter, _Filter);
@@ -640,31 +643,20 @@ var GlasFilter = function (_Filter) {
         value: function render() {
             var ctx = this.ctx;
 
+            this.smallCtx.drawImage(this.image, 0, 0, this.width * SCALE, this.height * SCALE);
+
+            ctx.drawImage(this.smallCanvas, 0, 0, this.width, this.height);
+
             if (this.points) {
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 50;
                 ctx.beginPath();
                 this.points.forEach(function (point, index) {
-                    if (index) {
-                        ctx.lineTo(point[0], point[1]);
-                    } else {
-                        ctx.moveTo(point[0], point[1]);
-                    }
+                    ctx.moveTo(point[0], point[1]);
+                    ctx.arc(point[0], point[1], FINGER_SIZE / 2, 0, Math.PI * 2);
                 });
-                ctx.stroke();
-
-                ctx.save();
-                ctx.globalCompositeOperation = 'source-in';
+                ctx.clip();
                 this.drawImage();
                 ctx.restore();
             }
-
-            this.smallCtx.drawImage(this.image, 0, 0, this.width * SCALE, this.height * SCALE);
-
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.drawImage(this.smallCanvas, 0, 0, this.width, this.height);
-            ctx.restore();
         }
     }]);
 

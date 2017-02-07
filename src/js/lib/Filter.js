@@ -23,6 +23,7 @@ export default class Filter extends EventEmitter {
             const touch = touches[0];
             if (!touch) return;
 
+            e.preventDefault();
             this.handlePointerStart(touch);
         });
         
@@ -33,6 +34,7 @@ export default class Filter extends EventEmitter {
             const touch = touches[0];
             if (!touch) return;
 
+            e.preventDefault();
             this.handlePointerMove(touch);
         });
         

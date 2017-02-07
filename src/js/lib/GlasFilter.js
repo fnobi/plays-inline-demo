@@ -1,6 +1,7 @@
 import Filter from './Filter';
 
 const SCALE = 0.05;
+const FINGER_SIZE = 50;
 
 export default class GlasFilter extends Filter {
     constructor (opts) {
@@ -19,30 +20,19 @@ export default class GlasFilter extends Filter {
     render () {
         const ctx = this.ctx;
 
+        this.smallCtx.drawImage(this.image, 0, 0, this.width * SCALE, this.height * SCALE);
+
+        ctx.drawImage(this.smallCanvas, 0, 0, this.width, this.height);
+        
         if (this.points) {
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 50;
             ctx.beginPath();
             this.points.forEach((point, index) => {
-                if (index) {
-                    ctx.lineTo(point[0], point[1]);
-                } else {
-                    ctx.moveTo(point[0], point[1]);
-                }
+                ctx.moveTo(point[0], point[1]);
+                ctx.arc(point[0], point[1], FINGER_SIZE / 2, 0, Math.PI * 2);
             });
-            ctx.stroke();
-
-            ctx.save();
-            ctx.globalCompositeOperation = 'source-in';
+            ctx.clip();
             this.drawImage();
             ctx.restore();
         }
-
-        this.smallCtx.drawImage(this.image, 0, 0, this.width * SCALE, this.height * SCALE);
-
-        ctx.save();
-        ctx.globalCompositeOperation = 'destination-over';
-        ctx.drawImage(this.smallCanvas, 0, 0, this.width, this.height);
-        ctx.restore();
     }
 };
